@@ -1,0 +1,11 @@
+[package]
+name = "digital_garden"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "garden"
+path = "src/main.rs"
+
+[dependencies]
+color-eyre = "0.6.2"
