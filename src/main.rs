@@ -1,4 +1,5 @@
 use color_eyre::eyre::Result;
+use digital_garden::write;
 use structopt::StructOpt;
 
 /// A CLI for the growing and curation of a digital garden
@@ -28,6 +29,8 @@ enum Command {
 fn main() -> Result<()> {
     color_eyre::install()?;
     let opt = Opt::from_args();
-    dbg!(opt);
-    todo!();
+    dbg!(&opt);
+    match opt.cmd {
+        Command::Write { title } => write(title),
+    }
 }
