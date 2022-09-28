@@ -1,5 +1,5 @@
 use std::path::PathBuf;
-use color_eyre::eyre::{eyre, Result, Context};
+use color_eyre::eyre::{eyre, Result, WrapErr};
 use digital_garden::write;
 use directories::UserDirs;
 use structopt::StructOpt;
@@ -54,6 +54,6 @@ fn main() -> Result<()> {
     }?;
 
     match opt.cmd {
-        Command::Write { title } => write(title),
+        Command::Write { title } => write(garden_path, title),
     }
 }
