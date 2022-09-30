@@ -16,6 +16,7 @@ color-eyre = "0.6.2"
 directories = "4.0.1"
 edit = "0.1.4"
 rprompt = "1.0.5"
+slug = "0.1.4"
 structopt = "0.3.26"
 
 [dev-dependencies]

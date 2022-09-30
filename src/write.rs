@@ -1,5 +1,6 @@
-use color_eyre::{eyre::WrapErr, Result};
+use color_eyre::{eyre::WrapErr, owo_colors::OwoColorize, Result};
 use edit::{edit_file, Builder};
+use std::fs;
 use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::PathBuf;
 
@@ -15,7 +16,7 @@ pub fn write(garden_path: PathBuf, title: Option<String>) -> Result<()> {
         .wrap_err("Failed to keep temp file")?;
 
     file.write_all(TEMPLATE)?;
-    edit_file(filepath)?;
+    edit_file(&filepath)?;
 
     let mut contents = String::new();
     file.seek(SeekFrom::Start(0))?;
@@ -31,17 +32,37 @@ pub fn write(garden_path: PathBuf, title: Option<String>) -> Result<()> {
     let filename = match document_title {
         Some(raw_title) => confirm_filename(&raw_title),
         None => ask_for_filename(),
-    };
+    }?;
 
-    todo!()
+    let mut i: usize = 0;
+    loop {
+        let dest_filename = format!(
+            "{}{}",
+            filename,
+            if i == 0 {
+                "".to_string()
+            } else {
+                i.to_string()
+            }
+        );
+        let mut dest = garden_path.join(dest_filename);
+        dest.set_extension("md");
+        if dest.exists() {
+            i += 1;
+        } else {
+            fs::rename(filepath, &dest)?;
+            break;
+        }
+    }
+
+    Ok(())
 }
 
 fn confirm_filename(raw_title: &str) -> Result<String> {
     loop {
         let result = rprompt::prompt_reply_stderr(&format!(
-            "\
-            current title: `{}`
-            Do you want a different title? (y/N):",
+            "{} {}\nDo you want a different title? (y/N): ",
+            "Current title: ".green().bold(),
             raw_title,
         ))
         .wrap_err("Failed to get input for y/n question")?;
@@ -57,11 +78,7 @@ fn confirm_filename(raw_title: &str) -> Result<String> {
 }
 
 fn ask_for_filename() -> Result<String> {
-    rprompt::prompt_reply_stderr(
-        "\
-        EnterFilename
-        >
-        ",
-    )
-    .wrap_err("Failed to get filename")
+    rprompt::prompt_reply_stderr(&format!("{}", "\nEnter filename\n>".blue().bold()))
+        .wrap_err("Failed to get filename")
+        .map(|title| slug::slugify(title))
 }
