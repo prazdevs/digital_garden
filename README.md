@@ -1,4 +1,4 @@
-# Digital Garde
+# Digital Garden
 
 A CLI tool for the creation and maintenance of Digital Gardens.
 
